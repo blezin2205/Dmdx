@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>258802196825-i1qv5f474t56kk5fac7ue9uj1rfk3h4i.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.258802196825-i1qv5f474t56kk5fac7ue9uj1rfk3h4i</string>
+	<key>API_KEY</key>
+	<string>AIzaSyC11IGarMM_RpVwJ6l0LIr449MStPGEB5I</string>
+	<key>GCM_SENDER_ID</key>
+	<string>258802196825</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>Blezin.Dmdx</string>
+	<key>PROJECT_ID</key>
+	<string>dmdx-8adff</string>
+	<key>STORAGE_BUCKET</key>
+	<string>dmdx-8adff.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:258802196825:ios:eea83ce1bd191061d3ec48</string>
+</dict>
+</plist>
