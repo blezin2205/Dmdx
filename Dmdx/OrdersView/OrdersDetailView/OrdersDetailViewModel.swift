@@ -73,6 +73,10 @@ class OrdersDetailViewModel: ObservableObject {
             let docRef = db.collection("supplies").document(supply.id)
             butch.setData(supply.saveToOrders(), forDocument: orderRef.collection("supplies").document(supply.id))
             let deltaCount = supply.count - (supply.countOnHold ?? 0)
+            self.suppliesInOrder[index].countOnHold = supply.count
+            
+                         print(deltaCount)
+         
            // suppliesInOrder[index].totalCount += deltaCount
             butch.updateData(["countOnHold": FieldValue.increment(Int64(deltaCount))], forDocument: docRef)
         }
@@ -94,7 +98,7 @@ class OrdersDetailViewModel: ObservableObject {
             butch.updateData(["count": FieldValue.increment(Int64(-supply.count))], forDocument: docRef)
             butch.updateData(["countOnHold": FieldValue.increment(Int64(-supply.count))], forDocument: docRef)
         }
-        butch.updateData(["isComplete": true], forDocument: orderRef)
+        butch.updateData(["isComplete": true, "dateSent": Timestamp(date: Date())], forDocument: orderRef)
         butch.commit(completion: { (error) in
                 if let error = error {
                     print("\(error)")

@@ -16,8 +16,8 @@ class CartViewModel: ObservableObject {
     @Published var cart = [Supply]()
     @Published var cartCount = Int()
     @Published var cartCountSupply = 0
-    @Published var places = [String]()
-    @Published var selectedPlace: String?
+    @Published var places = [Place]()
+    @Published var selectedPlace: Place?
     private let cartKeyUserDef = "cartItems"
     @Published var idForOrder: Int = 0
     
@@ -45,6 +45,7 @@ class CartViewModel: ObservableObject {
     }
     
     func addSupplyToCart(supply: Supply) {
+        print(supply)
         cart.append(supply)
         saveSuppliesToSerDefaults()
     }
@@ -71,7 +72,8 @@ class CartViewModel: ObservableObject {
             } else {
                 if let snapshot = snapshot {
                     self.places = snapshot.documents.map({ item in
-                        item.documentID
+                        let place = Place(getPlaceSnapshot: item)
+                        return place
                     })
                 }
             }
@@ -89,7 +91,7 @@ class CartViewModel: ObservableObject {
     
     func updateDBforCart(complition: @escaping () -> Void) {
         
-        let order = Order(id: idForOrder, place: selectedPlace ?? "", dateCreated: Date(), isComplete: false)
+        let order = Order(id: idForOrder, place: selectedPlace!, dateCreated: Date(), isComplete: false)
         
         let orderRef = db.collection("orders").document()
         orderRef.setData(order.convertToDictionary())

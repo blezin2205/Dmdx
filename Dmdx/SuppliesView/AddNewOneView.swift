@@ -7,6 +7,7 @@
 
 import SwiftUI
 import Firebase
+import Combine
 
 struct AddNewOneView: View {
     @ObservedObject var viewModel: ViewModel
@@ -20,6 +21,7 @@ struct AddNewOneView: View {
     @State private var totalCount = 1
     @State private var isSupplyEdit = false
     @State private var elementIsAdded = false
+    @State private var supplyLot = ""
     
     var body: some View {
             ScrollView {
@@ -34,16 +36,16 @@ extension AddNewOneView {
             if supply == nil {
                 header
             }
-            categoryPicker
-                .disabled(supply != nil && !isSupplyEdit)
-            Spacer()
-            nametextField
-                .disabled(supply != nil && !isSupplyEdit)
-            Spacer()
-            expirationDatePicker
-                .disabled(supply != nil && !isSupplyEdit)
-            countOfNewOne
-                .disabled(supply != nil && !isSupplyEdit)
+            VStack(alignment: .leading, spacing: 24) {
+                categoryPicker
+                    .padding(.bottom)
+                nametextField
+                lotTextField
+                Spacer()
+                expirationDatePicker
+                countOfNewOne
+            }.disabled(supply != nil && !isSupplyEdit)
+        
             if supply != nil && supply!.totalCount - (supply!.countOnHold ?? 0) > 0 {
                 countAddToCart.opacity(cartViewModel.cart.contains(where: {$0.id == supply!.id}) ? 0 : 1).animation(.linear, value: cartViewModel.cart.contains(where: {$0.id == supply!.id}))
             }
@@ -61,6 +63,7 @@ extension AddNewOneView {
                     date = supply.expiredDate
                     count = supply.count
                     totalCount = supply.totalCount
+                    supplyLot = supply.supplyLot ?? ""
                 } else {
                     selected = viewModel.devices.first ?? ""
                 }
@@ -78,7 +81,8 @@ extension AddNewOneView {
                                                  totalCount: totalCount,
                                                  dateCreated: Date(),
                                                  expiredDate: date,
-                                                 countOnHold: supply?.countOnHold)
+                                                 countOnHold: supply?.countOnHold,
+                                                 supplyLot: supplyLot)
                             viewModel.updateElementById(id: supply!.id, newSupply: _supply, oldSupply: supply!)
                         }
                         isSupplyEdit.toggle()
@@ -113,7 +117,7 @@ extension AddNewOneView {
                                          device: selected,
                                          count: count, totalCount: supply?.totalCount ?? totalCount,
                                          dateCreated: Date(),
-                                         expiredDate: date)
+                                         expiredDate: date, supplyLot: supplyLot)
                     viewModel.addNewElementToDB(supply: _supply) {
                         elementIsAdded = true
                     }
@@ -141,7 +145,7 @@ extension AddNewOneView {
                                          count: count, totalCount: supply?.totalCount ?? totalCount,
                                          dateCreated: Date(),
                                          expiredDate: date,
-                                         countOnHold: supply?.countOnHold)
+                                         countOnHold: supply?.countOnHold, supplyLot: supplyLot)
                     cartViewModel.addSupplyToCart(supply: _supply)
                 } label: {
                     Text(cartViewModel.cart.contains(where: {$0.id == supply!.id}) ? "Добавлено в корзину" : "Добавить в корзину")
@@ -154,8 +158,8 @@ extension AddNewOneView {
                 .background(colorScheme == .dark ? Color.secondary : Color.white)
                 .cornerRadius(12)
                 .shadow(radius: 3)
-                .disabled(cartViewModel.cart.contains(where: {$0.id == supply!.id}))
-                .opacity(cartViewModel.cart.contains(where: {$0.id == supply!.id}) ? 0.4 : 1)
+                .disabled(cartViewModel.cart.contains(where: {$0.id == supply!.id}) || isSupplyEdit)
+                .opacity(cartViewModel.cart.contains(where: {$0.id == supply!.id}) || isSupplyEdit ? 0.4 : 1)
                 
             }
         }
@@ -185,9 +189,10 @@ extension AddNewOneView {
             set: {
                 supplyName = $0
                 viewModel.supplyName = $0
-                withAnimation {
-                    elementIsAdded = false
-                    
+                if elementIsAdded {
+                    withAnimation {
+                        elementIsAdded = false
+                    }
                 }
             })
         
@@ -201,13 +206,38 @@ extension AddNewOneView {
         }
     }
     
-    private var expirationDatePicker: some View {
-        DatePicker(selection: $date, in: Date()..., displayedComponents: .date) {
-            Text("3. Срок годности")
+    private var lotTextField: some View {
+        VStack(alignment: .leading) {
+            Text("2. LOT Товара")
                 .font(.callout)
                 .bold()
+            TextField("Введите LOT Товара(Опционально))", text: $supplyLot, onCommit: {
+            })
+                .textFieldStyle(RoundedBorderTextFieldStyle())
+                .frame(width: 250)
         }
-        .environment(\.locale, Locale.init(identifier: "ru"))
+    }
+    
+    private var expirationDatePicker: some View {
+        
+        let binding = Binding<Date>(
+            get: { date },
+            set: {
+                date = $0
+                if elementIsAdded {
+                    withAnimation {
+                        elementIsAdded = false
+                    }
+                }
+            })
+        return ZStack {
+            DatePicker(selection: binding, in: Date().dateForStartExpired()..., displayedComponents: .date) {
+                Text("3. Срок годности")
+                    .font(.callout)
+                    .bold()
+            }
+            .environment(\.locale, Locale.init(identifier: "ru"))
+        }
     }
     
     private var countOfNewOne: some View {

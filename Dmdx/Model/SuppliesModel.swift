@@ -16,9 +16,10 @@ struct Supply: Identifiable, Codable {
     var totalCount: Int
     let dateCreated: Date
     let expiredDate: Date
-    let countOnHold: Int?
+    var countOnHold: Int?
+    let supplyLot: String?
     
-    init(id: String, name: String, device: String, count: Int, totalCount: Int, dateCreated: Date, expiredDate: Date, countOnHold: Int? = nil) {
+    init(id: String, name: String, device: String, count: Int, totalCount: Int, dateCreated: Date, expiredDate: Date, countOnHold: Int? = nil, supplyLot: String? = nil) {
         self.id = id
         self.name = name
         self.device = device
@@ -27,6 +28,7 @@ struct Supply: Identifiable, Codable {
         self.dateCreated = dateCreated
         self.expiredDate = expiredDate
         self.countOnHold = countOnHold
+        self.supplyLot = supplyLot
     }
     
     init(setSupply: QueryDocumentSnapshot) {
@@ -38,6 +40,7 @@ struct Supply: Identifiable, Codable {
         self.dateCreated = (setSupply["dateCreated"] as? Timestamp)?.dateValue() ?? Date()
         self.expiredDate = (setSupply["expiredDate"] as? Timestamp)?.dateValue() ?? Date()
         self.count = 1
+        self.supplyLot = setSupply["supplyLot"] as? String
     }
     
     init(getSupplyINorder: QueryDocumentSnapshot) {
@@ -49,14 +52,15 @@ struct Supply: Identifiable, Codable {
         self.expiredDate = (getSupplyINorder["expiredDate"] as? Timestamp)?.dateValue() ?? Date()
         self.count = getSupplyINorder["countInOrder"] as? Int ?? 0
         self.countOnHold = getSupplyINorder["countInOrder"] as? Int ?? 0
+        self.supplyLot = getSupplyINorder["supplyLot"] as? String
     }
     
     func convertToDictionary() -> [String: Any] {
-        return ["name": name, "device": device, "count": totalCount, "countOnHold": countOnHold ?? 0, "dateCreated": Timestamp(date: dateCreated), "expiredDate": Timestamp(date: expiredDate)]
+        return ["name": name, "device": device, "count": totalCount, "countOnHold": countOnHold ?? 0, "dateCreated": Timestamp(date: dateCreated), "expiredDate": Timestamp(date: expiredDate), "supplyLot": supplyLot ?? ""]
     }
     
     func saveToOrders() -> [String: Any] {
-        return ["name": name, "device": device, "countInOrder": count, "countInStorage": totalCount - count, "dateCreated": Timestamp(date: dateCreated), "expiredDate": Timestamp(date: expiredDate)]
+        return ["name": name, "device": device, "countInOrder": count, "countInStorage": totalCount - count, "dateCreated": Timestamp(date: dateCreated), "expiredDate": Timestamp(date: expiredDate), "dateSent": Timestamp(date: Date()), "supplyLot": supplyLot ?? ""]
     }
     
 }

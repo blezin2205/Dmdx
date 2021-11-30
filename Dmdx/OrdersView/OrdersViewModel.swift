@@ -62,15 +62,15 @@ class OrdersViewModel: ObservableObject {
 class Order: Identifiable {
     let documntId: String
     let id: Int
-    let place: String
+    let place: Place
     let dateCreated: Date
     var isComplete: Bool
     
     func convertToDictionary() -> [String: Any] {
-        return ["id": id, "place": place, "dateCreated": Timestamp(date: dateCreated), "isComplete": isComplete]
+        return ["orderId": id, "name": place.name, "city": place.city, "dateCreated": Timestamp(date: dateCreated), "dateSent": Timestamp(date: Date()), "isComplete": isComplete]
     }
     
-    init(id: Int, place: String, dateCreated: Date, isComplete: Bool) {
+    init(id: Int, place: Place, dateCreated: Date, isComplete: Bool) {
         self.id = id
         self.place = place
         self.dateCreated = dateCreated
@@ -80,8 +80,8 @@ class Order: Identifiable {
     
     init(setSupply: QueryDocumentSnapshot) {
         self.documntId = setSupply.documentID
-        self.id = setSupply["id"] as? Int ?? 0
-        self.place = setSupply["place"] as? String ?? ""
+        self.id = setSupply["orderId"] as? Int ?? 0
+        self.place = Place(getPlaceSnapshot: setSupply)
         self.dateCreated = (setSupply["dateCreated"] as? Timestamp)?.dateValue() ?? Date()
         self.isComplete = setSupply["isComplete"] as? Bool ?? false
     }

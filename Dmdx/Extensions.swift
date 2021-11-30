@@ -23,6 +23,15 @@ extension Date {
     func getComponents(_ component: Calendar.Component, calendar: Calendar = Calendar.current) -> Int {
         return calendar.component(component, from: self)
     }
+    
+    func dateForStartExpired() -> Date {
+        
+        let isoDate = "2020-01-01T10:44:00+0000"
+        let dateFormatter = DateFormatter()
+        dateFormatter.locale = Locale(identifier: "en_US_POSIX") // set locale to reliable US_POSIX
+        dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
+        return dateFormatter.date(from:isoDate)!
+    }
 }
 
 extension String {
@@ -30,5 +39,9 @@ extension String {
         let dateFormatter = DateFormatter()
         dateFormatter.dateStyle = .medium
         return dateFormatter.date(from: self) ?? Date()
+    }
+    
+    func getArrayOfComponentsSeparatedBy(character: String) -> [String] {
+        return self.components(separatedBy: character)
     }
 }

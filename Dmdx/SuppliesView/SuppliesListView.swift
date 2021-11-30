@@ -101,17 +101,28 @@ struct SupplyCellView: View {
         HStack {
             
             VStack(alignment: .leading, spacing: 4) {
-                Text(supply.name)
-                    .font(.system(size: 18, weight: .medium, design: .rounded))
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(supply.name)
+                        .font(.system(size: 18, weight: .medium, design: .rounded))
+                    if supply.supplyLot != nil, !supply.supplyLot!.isEmpty {
+                        HStack {
+                            Text("LOT:")
+                                .foregroundColor(Color.secondary)
+                            Text(supply.supplyLot ?? "")
+                        }.font(.subheadline)
+                    }
+                }.padding(.bottom, 4)
+                    .overlay(Divider(), alignment: .bottom)
+                
                 Text(supply.device)
-                    .font(.subheadline)
-                    .padding(.bottom, 4)
+                    .font(.footnote)
+                    
                 HStack {
                     Text("Срок годности:")
                         .foregroundColor(Color.secondary)
                     Text(supply.expiredDate.toString())
                         .foregroundColor(supply.expiredDate > Date() ? .accentColor : .red)
-                }
+                }.padding(.top, -2)
                 .font(.footnote)
                 if !viewForCart {
                     HStack {

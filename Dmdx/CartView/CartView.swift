@@ -117,9 +117,15 @@ struct ChoosePlaceView: View {
                 }
             }.padding()
             Divider()
-            List(cartVM.places, id: \.self, selection: $cartVM.selectedPlace) { name in
-                Text(name)
-                    .font(.system(size: 16, weight: .semibold, design: .default))
+            List(cartVM.places, id: \.self, selection: $cartVM.selectedPlace) { place in
+                VStack(alignment: .leading) {
+                    Text(place.name)
+                        .font(.system(size: 18, weight: .semibold, design: .default))
+                    Text(place.city)
+                        .font(.system(size: 14, weight: .regular, design: .default))
+                        .foregroundColor(.secondary)
+                }
+                
             }
         }
         .environment(\.editMode, .constant(EditMode.active))

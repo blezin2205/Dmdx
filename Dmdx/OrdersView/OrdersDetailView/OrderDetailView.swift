@@ -32,7 +32,13 @@ struct OrdersDetailView: View {
                         HStack {
                             Text("Для организации:")
                                 .foregroundColor(Color.secondary)
-                            Text("\(order.place)")
+                            Text("\(order.place.name)")
+                                
+                        }.font(.subheadline)
+                        HStack {
+                            Text("Город:")
+                                .foregroundColor(Color.secondary)
+                            Text("\(order.place.city)")
                                 
                         }.font(.subheadline)
                         
@@ -100,9 +106,7 @@ struct OrdersDetailView: View {
             
             
         }.onAppear {
-            if !ordersIsComplete {
                 vm.getSuppliesInTheOrder(order: order)
-            }
         }
         .overlay(
             Text("\(vm.suppliesInOrder.map {$0.count}.reduce(0, +))")

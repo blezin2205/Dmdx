@@ -19,6 +19,7 @@
 		FA7799C22750D2B00063142A /* OrdersViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA7799C12750D2B00063142A /* OrdersViewModel.swift */; };
 		FA7799C527515EE10063142A /* OrdersDetailViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA7799C427515EE10063142A /* OrdersDetailViewModel.swift */; };
 		FA7799C7275168170063142A /* OrderDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA7799C6275168170063142A /* OrderDetailView.swift */; };
+		FAAD916827554C35001A5651 /* PlaceModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAAD916727554C34001A5651 /* PlaceModel.swift */; };
 		FAB22C31274C720C00F817BD /* SuppliesListForCategoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB22C30274C720C00F817BD /* SuppliesListForCategoryView.swift */; };
 		FAB22C34274C728500F817BD /* SuppliesForCategoryViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB22C33274C728500F817BD /* SuppliesForCategoryViewModel.swift */; };
 		FADC35F0274905C500449231 /* DmdxApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = FADC35EF274905C500449231 /* DmdxApp.swift */; };
@@ -41,6 +42,7 @@
 		FA7799C12750D2B00063142A /* OrdersViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrdersViewModel.swift; sourceTree = "<group>"; };
 		FA7799C427515EE10063142A /* OrdersDetailViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrdersDetailViewModel.swift; sourceTree = "<group>"; };
 		FA7799C6275168170063142A /* OrderDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrderDetailView.swift; sourceTree = "<group>"; };
+		FAAD916727554C34001A5651 /* PlaceModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceModel.swift; sourceTree = "<group>"; };
 		FAB22C30274C720C00F817BD /* SuppliesListForCategoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuppliesListForCategoryView.swift; sourceTree = "<group>"; };
 		FAB22C33274C728500F817BD /* SuppliesForCategoryViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuppliesForCategoryViewModel.swift; sourceTree = "<group>"; };
 		FADC35EC274905C500449231 /* Dmdx.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Dmdx.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -70,6 +72,7 @@
 			children = (
 				FA0F761B27501F0600C80D41 /* CartViewModel.swift */,
 				FA0F761E2750254400C80D41 /* CartView.swift */,
+				FAAD916727554C34001A5651 /* PlaceModel.swift */,
 			);
 			path = CartView;
 			sourceTree = "<group>";
@@ -244,6 +247,7 @@
 			files = (
 				FA580BAA274C004800EEEEAF /* TabView.swift in Sources */,
 				FA660BBD274C30FB003DAB66 /* AddNewOneView.swift in Sources */,
+				FAAD916827554C35001A5651 /* PlaceModel.swift in Sources */,
 				FAB22C34274C728500F817BD /* SuppliesForCategoryViewModel.swift in Sources */,
 				FADC35FF274906CE00449231 /* NetworkManager.swift in Sources */,
 				FADC35F2274905C500449231 /* SuppliesListView.swift in Sources */,

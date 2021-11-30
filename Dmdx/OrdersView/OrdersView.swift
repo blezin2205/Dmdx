@@ -55,7 +55,14 @@ struct OrderCellView: View {
                 HStack {
                     Text("Для организации:")
                         .foregroundColor(Color.secondary)
-                    Text("\(order.place)")
+                    Text("\(order.place.name)")
+                        .bold()
+                }
+                .font(.subheadline)
+                HStack {
+                    Text("Город:")
+                        .foregroundColor(Color.secondary)
+                    Text("\(order.place.city)")
                         .bold()
                 }
                 .font(.subheadline)
