@@ -15,6 +15,9 @@ struct SuppliesListView: View {
     @StateObject var vm = ViewModel()
     @State private var showingSheet = false
     @State private var searchText = ""
+    let fromOrderView: Bool
+    @ObservedObject var ordersDetailViewModel: OrdersDetailViewModel
+    @Environment(\.presentationMode) var presentationMode
     
     
     var body: some View {
@@ -25,20 +28,37 @@ struct SuppliesListView: View {
                 switch vm.sortOption {
                 case .all, .onlyExpired, .onlyGood:
                     List(searchResults) { supply in
-                        NavigationLink(destination: AddNewOneView(viewModel: vm, supply: supply)) {
-                            SupplyCellView(supply: supply, viewForCart: false)  
-                        }
-                        .swipeActions(allowsFullSwipe: false) {
-                            Button(role: .destructive) {
-                                vm.deleteSupplyById(id: supply.id)
-                            } label: {
-                                Label("Delete", systemImage: "trash.fill")
+                        if fromOrderView {
+                                SupplyCellView(supply: supply, viewForCart: false, fromOrderView: fromOrderView)
+                                .onTapGesture(perform: {
+                                    ordersDetailViewModel.addNewOneInOrder(supply: supply) {
+                                        presentationMode.wrappedValue.dismiss()
+                                    }
+                                })
+                            
+                            .swipeActions(allowsFullSwipe: false) {
+                                Button(role: .destructive) {
+                                    vm.deleteSupplyById(id: supply.id)
+                                } label: {
+                                    Label("Delete", systemImage: "trash.fill")
+                                }
+                            }
+                        } else {
+                            NavigationLink(destination: AddNewOneView(viewModel: vm, supply: supply)) {
+                                SupplyCellView(supply: supply, viewForCart: false, fromOrderView: fromOrderView)
+                            }
+                            .swipeActions(allowsFullSwipe: false) {
+                                Button(role: .destructive) {
+                                    vm.deleteSupplyById(id: supply.id)
+                                } label: {
+                                    Label("Delete", systemImage: "trash.fill")
+                                }
                             }
                         }
                     }
                 case .categories:
                     List(vm.devices, id: \.self) { device in
-                        NavigationLink(destination: SuppliesListForCategoryView(category: device)) {
+                        NavigationLink(destination: SuppliesListForCategoryView(fromOrderView: fromOrderView, category: device)) {
                             Text(device)
                                 .padding()
                                 .font(.system(size: 22, weight: .medium, design: .rounded))
@@ -54,7 +74,7 @@ struct SuppliesListView: View {
                         showingSheet.toggle()
                     } label: {
                         Image(systemName: "plus")
-                    }
+                    }.opacity(fromOrderView ? 0 : 1)
                 }
                 
                 ToolbarItem(placement: .navigationBarLeading) {
@@ -84,15 +104,10 @@ struct SuppliesListView: View {
         }
 }
 
-struct ContentView_Previews: PreviewProvider {
-    static var previews: some View {
-        SuppliesListView()
-    }
-}
-
 struct SupplyCellView: View {
     let supply: Supply
     let viewForCart: Bool
+    let fromOrderView: Bool
     @EnvironmentObject var cartVM: CartViewModel
     @Environment(\.colorScheme) var colorScheme
     var body: some View {
@@ -189,20 +204,21 @@ struct SupplyCellView: View {
                             .padding(.trailing, 12)
                         
                     }
-                    
-                    Button {
-                        cartVM.addSupplyToCart(supply: supply)
-                    } label: {
-                        Image(systemName: cartVM.cart.contains(where: {$0.id == supply.id}) ? "cart" : "cart.badge.plus")
-                            .foregroundColor(cartVM.cart.contains(where: {$0.id == supply.id}) ? .green : Color.blue)
-                            .frame(width: 40, height: 30, alignment: .center)
-                            .background(colorScheme == .dark ? Color("backgrndButton") : Color.white)
-                            .cornerRadius(6)
-                            .shadow(radius: 2)
-                            .padding(.trailing, 12)
-                        
-                    }.buttonStyle(PlainButtonStyle())
-                        .disabled(cartVM.cart.contains(where: {$0.id == supply.id}) || (supply.totalCount - (supply.countOnHold ?? 0)) == 0)
+                    if !fromOrderView {
+                        Button {
+                            cartVM.addSupplyToCart(supply: supply)
+                        } label: {
+                            Image(systemName: cartVM.cart.contains(where: {$0.id == supply.id}) ? "cart" : "cart.badge.plus")
+                                .foregroundColor(cartVM.cart.contains(where: {$0.id == supply.id}) ? .green : Color.blue)
+                                .frame(width: 40, height: 30, alignment: .center)
+                                .background(colorScheme == .dark ? Color("backgrndButton") : Color.white)
+                                .cornerRadius(6)
+                                .shadow(radius: 2)
+                                .padding(.trailing, 12)
+                            
+                        }.buttonStyle(PlainButtonStyle())
+                            .disabled(cartVM.cart.contains(where: {$0.id == supply.id}) || (supply.totalCount - (supply.countOnHold ?? 0)) == 0)
+                    }
                 }
                 
                

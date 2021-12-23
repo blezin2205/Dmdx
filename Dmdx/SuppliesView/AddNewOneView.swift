@@ -260,19 +260,30 @@ extension AddNewOneView {
     }
     
     private var countAddToCart: some View {
-        VStack(alignment: .leading) {
+        
+        let binding = Binding<Int>(get: {
+                    self.count
+                }, set: {
+                    if $0 > (supply!.totalCount - (supply!.countOnHold ?? 0)) {
+                        self.count = supply!.totalCount
+                    } else {
+                        self.count = $0
+                    }
+                })
+        
+       return VStack(alignment: .leading) {
             Text("5. В корзину")
                 .font(.callout)
                 .bold()
             HStack {
-                TextField("", value: $count, formatter: NumberFormatter())
+                TextField("", value: binding, formatter: NumberFormatter())
+                    .keyboardType(.numberPad)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .multilineTextAlignment(.center)
                     .frame(width: 120)
-                    .keyboardType(.numberPad)
-                    .disabled(true)
+                    
                 Spacer()
-                Stepper("Количество", value: $count, in: 1...(supply!.totalCount - (supply!.countOnHold ?? 0)))
+                Stepper("Количество", value: binding, in: 1...(supply!.totalCount - (supply!.countOnHold ?? 0)))
                     .labelsHidden()
                 
             }

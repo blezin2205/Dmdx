@@ -31,7 +31,7 @@ struct Supply: Identifiable, Codable {
         self.supplyLot = supplyLot
     }
     
-    init(setSupply: QueryDocumentSnapshot) {
+    init(setSupply: DocumentSnapshot) {
         self.id = setSupply.documentID
         self.name = setSupply["name"] as? String ?? ""
         self.device = setSupply["device"] as? String ?? ""

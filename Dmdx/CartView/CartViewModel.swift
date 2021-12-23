@@ -20,6 +20,7 @@ class CartViewModel: ObservableObject {
     @Published var selectedPlace: Place?
     private let cartKeyUserDef = "cartItems"
     @Published var idForOrder: Int = 0
+    @Published var commentText = ""
     
     init() {
         fetchTotalCountOfOrders()
@@ -91,7 +92,7 @@ class CartViewModel: ObservableObject {
     
     func updateDBforCart(complition: @escaping () -> Void) {
         
-        let order = Order(id: idForOrder, place: selectedPlace!, dateCreated: Date(), isComplete: false)
+        let order = Order(id: idForOrder, place: selectedPlace!, dateCreated: Date(), isComplete: false, commentText: commentText.isEmpty ? nil : commentText)
         
         let orderRef = db.collection("orders").document()
         orderRef.setData(order.convertToDictionary())

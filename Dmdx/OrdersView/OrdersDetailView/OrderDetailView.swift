@@ -10,17 +10,20 @@ import SwiftUI
 
 struct OrdersDetailView: View {
     let order: Order
-    @StateObject var vm = OrdersDetailViewModel()
+    @ObservedObject var vm: OrdersDetailViewModel
     @Environment(\.presentationMode) var presentationMode
     @Environment(\.colorScheme) var colorScheme
     @State private var showAlert = false
     @State private var editOrder = false
+    @State private var addNewOne = false
     @State private var ordersIsComplete: Bool
     @State private var alertMessage = ""
     
     init(order: Order) {
         self.order = order
         self._ordersIsComplete = State.init(wrappedValue: order.isComplete)
+        self._vm = ObservedObject.init(wrappedValue: OrdersDetailViewModel(orderId: order.documntId))
+        self.vm.commentText = order.commentText ?? ""
     }
     
     
@@ -48,42 +51,59 @@ struct OrdersDetailView: View {
                             Text("\(order.dateCreated.toString())")
                                
                         }.font(.footnote)
-                        
+                            TextField("Напишите комментарий", text: $vm.commentText)
+                                .disabled(!editOrder)
                     }
                     Spacer()
-                    Button {
+                    
+                    HStack(spacing: 32) {
                         if editOrder {
-                            withAnimation {
-                                editOrder.toggle()
+                            Button {
+                                withAnimation {
+                                    addNewOne.toggle()
+                                }
+                            } label: {
+                                Image(systemName: "xmark")
+                                    .rotationEffect(Angle(degrees: 45))
                             }
-                        } else {
-                            alertMessage = "Подтвердить отправку товара?"
-                            showAlert.toggle()
                         }
-                        
-                    } label: {
-                        if editOrder {
-                            Image(systemName: "xmark")
-                                .rotationEffect(Angle(degrees: 180))
+                        Button {
+                            if editOrder {
+                                withAnimation {
+                                    editOrder.toggle()
+                                }
+                            } else {
+                                alertMessage = "Подтвердить отправку товара?"
+                                showAlert.toggle()
+                            }
                             
-                        } else {
-                            Image(systemName: "paperplane")
-                        }
-                        
-                    }.disabled(ordersIsComplete)
+                        } label: {
+                            if editOrder {
+                                Image(systemName: "xmark")
+                                    
+                                
+                            } else {
+                                Image(systemName: "paperplane")
+                            }
+                            
+                        }.disabled(ordersIsComplete)
+                    }
+                    
                 }.padding()
             }
             
             Section {
                 List(vm.suppliesInOrder) { supply in
                     OrderDetailCellView(supply: supply, editOrders: $editOrder, orderIsComplete: $ordersIsComplete, ordersDetailViewModel: vm)
-//                        .swipeActions(allowsFullSwipe: false) {
-//                            Button(role: .destructive) {
-//                                vm.deleteSupplyInOrder(orderId: order.documntId, supply: supply)
-//                            } label: {
-//                                Label("Delete", systemImage: "trash.fill")
-//                            }
-//                        }
+                        .swipeActions(allowsFullSwipe: false) {
+                            Button(role: .destructive) {
+                                vm.deleteSupplyInOrder(orderId: order.documntId, supply: supply) {
+                                    presentationMode.wrappedValue.dismiss()
+                                }
+                            } label: {
+                                Label("Delete", systemImage: "trash.fill")
+                            }
+                        }
                 }
                 
             }
@@ -98,6 +118,9 @@ struct OrdersDetailView: View {
                         }
                     }.disabled(ordersIsComplete)
                 }
+            }
+            .sheet(isPresented: $addNewOne) {
+                SuppliesListView(fromOrderView: true, ordersDetailViewModel: vm)
             }
             .listStyle(PlainListStyle())
             .navigationBarTitleDisplayMode(.inline)
@@ -179,10 +202,17 @@ struct OrderDetailCellView: View {
                     Text(supply.device)
                         .font(.subheadline)
                         .padding(.bottom, 4)
-                    HStack {
-                        Text("Срок годности:")
-                        Text(supply.expiredDate.toString())
-                            .foregroundColor(supply.expiredDate > Date() ? .accentColor : .red)
+                    VStack(alignment: .leading) {
+                        HStack {
+                            Text("Срок годности:")
+                                .foregroundColor(.gray)
+                            Text(supply.expiredDate.toString())
+                        }
+                        HStack {
+                            Text("Обновлено:")
+                                .foregroundColor(.gray)
+                            Text(supply.dateCreated.toString())
+                        }
                     }
                     .font(.footnote)
                     

@@ -9,11 +9,12 @@ import SwiftUI
 
 struct SuppliesListForCategoryView: View {
     @StateObject var vm = SuppliesForCategoryViewModel()
+    let fromOrderView: Bool
     let category: String
     var body: some View {
         List(vm.sortedSuppliesForCategory) { supply in
             NavigationLink(destination: AddNewOneView(viewModel: ViewModel(), supply: supply)) {
-                SupplyCellView(supply: supply, viewForCart: false)
+                SupplyCellView(supply: supply, viewForCart: false, fromOrderView: fromOrderView)
             }
         }.onAppear {
             vm.getDataforCategory(category: category)

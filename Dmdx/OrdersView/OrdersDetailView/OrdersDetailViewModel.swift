@@ -12,10 +12,15 @@ class OrdersDetailViewModel: ObservableObject {
     
     
     let db = Firestore.firestore()
+    let orderId: String
     @Published var suppliesInOrder = [Supply]()
     @Published var suppliesInGeneralData = [Supply]()
     @Published var arrayOfBoolen: [Bool] = Array.init(repeating: false, count: 1)
+    @Published var commentText = ""
     
+    init(orderId: String) {
+        self.orderId = orderId
+    }
     
     func getSuppliesInTheOrder(order: Order) {
         let ref = db.collection("orders").document(order.documntId).collection("supplies")
@@ -38,15 +43,19 @@ class OrdersDetailViewModel: ObservableObject {
     func getActualCountOfSupplies() {
         let suppliesRef = db.collection("supplies")
         let documentsId = suppliesInOrder.map {$0.id}
-        suppliesRef.whereField(FieldPath.documentID(), in: documentsId).getDocuments { snap, error in
-            if let snapshot = snap {
-                let generalSupplies = snapshot.documents.map({ supply in
-                    Supply(setSupply: supply)
-                })
-                self.createNewArray(suppliesInStorage: generalSupplies)
-                
-            } else {
-                print(#function, error?.localizedDescription ?? "")
+        
+        documentsId.forEach { id in
+            suppliesRef.document(id).getDocument { snap, error in
+                if let snapshot = snap {
+                    let supply = Supply(setSupply: snapshot)
+                    if let index = self.suppliesInOrder.firstIndex(where: {$0.id == supply.id}) {
+                        if self.suppliesInOrder[index].id == supply.id {
+                            self.suppliesInOrder[index].totalCount = supply.totalCount + self.suppliesInOrder[index].count - (supply.countOnHold ?? 0)
+                        }
+                    }
+                }  else {
+                    print(#function, error?.localizedDescription ?? "")
+                }
             }
             
         }
@@ -69,6 +78,11 @@ class OrdersDetailViewModel: ObservableObject {
     func updateOrder(orderId: String) {
         let butch = self.db.batch()
         let orderRef = db.collection("orders").document(orderId)
+        if !commentText.isEmpty {
+            db.collection("orders").document(orderId).updateData(["comment": commentText])
+        } else {
+            db.collection("orders").document(orderId).updateData(["comment": FieldValue.delete()])
+        }
         suppliesInOrder.enumerated().forEach { index, supply in
             let docRef = db.collection("supplies").document(supply.id)
             butch.setData(supply.saveToOrders(), forDocument: orderRef.collection("supplies").document(supply.id))
@@ -110,7 +124,12 @@ class OrdersDetailViewModel: ObservableObject {
           
     }
     
-    func deleteSupplyInOrder(orderId: String, supply: Supply) {
+    func addNewOneInOrder(supply: Supply, complition: @escaping () -> Void) {
+        self.suppliesInOrder.append(supply)
+        complition()
+    }
+    
+    func deleteSupplyInOrder(orderId: String, supply: Supply, complition: @escaping () -> Void) {
         let butch = self.db.batch()
         let docRef = db.collection("supplies").document(supply.id)
         let ref = db.collection("orders").document(orderId).collection("supplies").document(supply.id)
@@ -121,7 +140,20 @@ class OrdersDetailViewModel: ObservableObject {
                     print("\(error)")
                 } else {
                     if let index = self.suppliesInOrder.firstIndex(where: {$0.id == supply.id}) {
-                        self.suppliesInOrder.remove(at: index)
+                        if self.suppliesInOrder.count == 1 {
+                            self.db.collection("orders").document(orderId).delete { error in
+                                if let error = error {
+                                    print(error)
+                                } else {
+                                    self.suppliesInOrder.remove(at: index)
+                                    complition()
+                                    print("success", #function)
+                                }
+                            }
+                        } else {
+                            self.suppliesInOrder.remove(at: index)
+                        }
+                        
                         print("success with local Remove from Array", #function)
                     }
                     print("success", #function)

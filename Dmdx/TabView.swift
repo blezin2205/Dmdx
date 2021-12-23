@@ -11,13 +11,13 @@ struct MainTabView: View {
     @ObservedObject var cartViewModel =  CartViewModel()
     var body: some View {
             TabView {
-                SuppliesListView()
+                SuppliesListView(fromOrderView: false, ordersDetailViewModel: OrdersDetailViewModel(orderId: ""))
                     .tabItem {
                         Image(systemName: "house.fill")
                         Text("Склад")
                     }
              
-                OrdersView()
+                OrdersView(place: nil)
                     .tabItem {
                         Image(systemName: "bookmark.circle.fill")
                         Text("Отправки")

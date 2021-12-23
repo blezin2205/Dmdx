@@ -25,29 +25,37 @@ struct CartView: View {
                             .animation(.interactiveSpring(), value: cartVM.cart.isEmpty)
                     }
                 } else {
-                    
-                    List {
-                        Section(header: Text("ID заказа: \(cartVM.idForOrder)")) {
-                            ForEach(cartVM.cart) { supply in
-                               
-                                SupplyCellView(supply: supply, viewForCart: true)
-                                    .swipeActions(allowsFullSwipe: true) {
-                                        Button(role: .destructive) {
-                                            if let index = cartVM.cart.firstIndex(where: {$0.id == supply.id}) {
-                                                cartVM.cart.remove(at: index)
+                    VStack {
+                        TextField("Комментарий", text: $cartVM.commentText, onCommit: {
+                        })
+                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                            .padding()
+                            .onAppear {
+                                cartVM.commentText = ""
+                            }
+
+                        List {
+                            Section(header: Text("ID заказа: \(cartVM.idForOrder)")) {
+                                ForEach(cartVM.cart) { supply in
+                                    
+                                    SupplyCellView(supply: supply, viewForCart: true, fromOrderView: false)
+                                        .swipeActions(allowsFullSwipe: true) {
+                                            Button(role: .destructive) {
+                                                if let index = cartVM.cart.firstIndex(where: {$0.id == supply.id}) {
+                                                    cartVM.cart.remove(at: index)
+                                                }
+                                            } label: {
+                                                Label("Delete", systemImage: "trash.fill")
                                             }
-                                        } label: {
-                                            Label("Delete", systemImage: "trash.fill")
                                         }
-                                    }
+                                    
+                                }
+                                
+                                
                                 
                             }
-                            
-                            
-                            
                         }
-                    }
-                    .listStyle(InsetGroupedListStyle())
+                        .listStyle(InsetGroupedListStyle())
                         .overlay(
                             Text("\(cartVM.cartCountSupply)")
                                 .bold()
@@ -59,6 +67,8 @@ struct CartView: View {
                                 .padding(16)
                             , alignment: .bottomTrailing
                         )
+                        
+                    }
                     
                 }
             }
