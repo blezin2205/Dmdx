@@ -12,12 +12,23 @@ import SwiftUI
 
 struct SuppliesListView: View {
     
-    @StateObject var vm = ViewModel()
+    @StateObject var vm: ViewModel
     @State private var showingSheet = false
     @State private var searchText = ""
     let fromOrderView: Bool
-    @ObservedObject var ordersDetailViewModel: OrdersDetailViewModel
+    
     @Environment(\.presentationMode) var presentationMode
+    let supplyForNewLot: Supply?
+    let addComplition: ((Supply) -> Void)?
+    let suppliesToCompare: [Supply]?
+    
+    init(fromOrderView: Bool, supplyForNewLot: Supply? = nil, suppliesToCompare: [Supply]? = nil, addComplition: ((Supply) -> Void)? = nil) {
+        self.fromOrderView = fromOrderView
+        self.supplyForNewLot = supplyForNewLot
+        self.suppliesToCompare = suppliesToCompare
+        self.addComplition = addComplition
+        self._vm = StateObject.init(wrappedValue: ViewModel(fromOrderView: fromOrderView))
+    }
     
     
     var body: some View {
@@ -29,23 +40,12 @@ struct SuppliesListView: View {
                 case .all, .onlyExpired, .onlyGood:
                     List(searchResults) { supply in
                         if fromOrderView {
-                                SupplyCellView(supply: supply, viewForCart: false, fromOrderView: fromOrderView)
-                                .onTapGesture(perform: {
-                                    ordersDetailViewModel.addNewOneInOrder(supply: supply) {
-                                        presentationMode.wrappedValue.dismiss()
-                                    }
-                                })
-                            
-                            .swipeActions(allowsFullSwipe: false) {
-                                Button(role: .destructive) {
-                                    vm.deleteSupplyById(id: supply.id)
-                                } label: {
-                                    Label("Delete", systemImage: "trash.fill")
-                                }
-                            }
+                            SupplyCellView(supply: supply, viewForCart: false, fromOrderView: fromOrderView, addToNote: suppliesToCompare?.contains(where: {$0.id == supply.id}) ?? false, addComplition: addComplition)
+                                
                         } else {
-                            NavigationLink(destination: AddNewOneView(viewModel: vm, supply: supply)) {
-                                SupplyCellView(supply: supply, viewForCart: false, fromOrderView: fromOrderView)
+                            NavigationLink(destination: AddNewOneView(viewModel: vm, supply: supply, addNewLot: false)) {
+                                SupplyCellView(supply: supply, viewForCart: false, fromOrderView: fromOrderView, addComplition: nil)
+                                    .environmentObject(vm)
                             }
                             .swipeActions(allowsFullSwipe: false) {
                                 Button(role: .destructive) {
@@ -58,7 +58,7 @@ struct SuppliesListView: View {
                     }
                 case .categories:
                     List(vm.devices, id: \.self) { device in
-                        NavigationLink(destination: SuppliesListForCategoryView(fromOrderView: fromOrderView, category: device)) {
+                        NavigationLink(destination: SuppliesListForCategoryView(fromOrderView: fromOrderView, category: device, suppliesToCompare: suppliesToCompare, addComplition: addComplition)) {
                             Text(device)
                                 .padding()
                                 .font(.system(size: 22, weight: .medium, design: .rounded))
@@ -88,7 +88,7 @@ struct SuppliesListView: View {
                 
             }
             .sheet(isPresented: $showingSheet) {
-                AddNewOneView(viewModel: vm)
+                AddNewOneView(viewModel: vm, addNewLot: false)
             }
         }.searchable(text: $searchText)
         
@@ -109,7 +109,14 @@ struct SupplyCellView: View {
     let viewForCart: Bool
     let fromOrderView: Bool
     @EnvironmentObject var cartVM: CartViewModel
+    @EnvironmentObject var vm: ViewModel
     @Environment(\.colorScheme) var colorScheme
+    @State private var showingSheet = false
+    @State var addToNote = false
+    @State private var countForService = 1
+    let addComplition: ((Supply) -> Void)?
+    
+
     var body: some View {
         
         
@@ -177,6 +184,45 @@ struct SupplyCellView: View {
                         .labelsHidden()
                     
                 }.padding(.vertical, 8)
+            } else if fromOrderView {
+                VStack(alignment: .center) {
+                    HStack(spacing: 8) {
+                        Button {
+                            addToNote = true
+                            addComplition?(Supply(id: supply.id,
+                                                 name: supply.name,
+                                                 device: supply.device,
+                                                 count: countForService,
+                                                 totalCount: supply.totalCount,
+                                                 dateCreated: supply.dateCreated,
+                                                 expiredDate: supply.expiredDate,
+                                                 countOnHold: supply.countOnHold,
+                                                 supplyLot: supply.supplyLot))
+                        } label: {
+                            Image(systemName: addToNote ? "checkmark.circle" : "plus.circle")
+                                .frame(width: 40, height: 30)
+                                .background(Color.green)
+                                .cornerRadius(6)
+                                .shadow(radius: 2)
+                        }.buttonStyle(PlainButtonStyle())
+                            .disabled(addToNote)
+                            .opacity(addToNote ? 0.7 : 1)
+                        Text("\(countForService)")
+                            .bold()
+                            .opacity(supply.totalCount == 0 ? 0.4 : 1)
+                            .frame(width: 40, height: 30)
+                            .background(colorScheme == .dark ? Color.secondary : Color.white)
+                            .cornerRadius(6)
+                            .shadow(radius: 2)
+                        
+                    }
+                    if supply.totalCount > 0 {
+                        Stepper("Количество", value: $countForService, in: 1...(supply.totalCount - (supply.countOnHold ?? 0)))
+                            .labelsHidden()
+                            .disabled(addToNote)
+                    }
+                }.padding(.vertical, 8)
+                
             } else {
                 
                 VStack(alignment: .trailing) {
@@ -205,19 +251,38 @@ struct SupplyCellView: View {
                         
                     }
                     if !fromOrderView {
-                        Button {
-                            cartVM.addSupplyToCart(supply: supply)
-                        } label: {
-                            Image(systemName: cartVM.cart.contains(where: {$0.id == supply.id}) ? "cart" : "cart.badge.plus")
-                                .foregroundColor(cartVM.cart.contains(where: {$0.id == supply.id}) ? .green : Color.blue)
-                                .frame(width: 40, height: 30, alignment: .center)
-                                .background(colorScheme == .dark ? Color("backgrndButton") : Color.white)
-                                .cornerRadius(6)
-                                .shadow(radius: 2)
-                                .padding(.trailing, 12)
+                        HStack(spacing: 4) {
+                            Button {
+                                showingSheet.toggle()
+                            } label: {
+                                VStack {
+                                    Text("new")
+                                    Text("LOT")
+                                }.foregroundColor(.black)
+                                    .font(.system(size: 10))
+                                    .padding(.horizontal, 8)
+                                    .frame(height: 30)
+                                    .frame(minWidth: 40)
+                                    .background(colorScheme == .dark ? Color("backgrndButton") : Color.white)
+                                    .cornerRadius(6)
+                                    .shadow(radius: 2)
+                            }.buttonStyle(PlainButtonStyle())
                             
-                        }.buttonStyle(PlainButtonStyle())
-                            .disabled(cartVM.cart.contains(where: {$0.id == supply.id}) || (supply.totalCount - (supply.countOnHold ?? 0)) == 0)
+                            Button {
+                                cartVM.addSupplyToCart(supply: supply)
+                            } label: {
+                                Image(systemName: cartVM.cart.contains(where: {$0.id == supply.id}) ? "cart" : "cart.badge.plus")
+                                    .foregroundColor(cartVM.cart.contains(where: {$0.id == supply.id}) ? .green : Color.blue)
+                                    .frame(width: 40, height: 30, alignment: .center)
+                                    .background(colorScheme == .dark ? Color("backgrndButton") : Color.white)
+                                    .cornerRadius(6)
+                                    .shadow(radius: 2)
+                                    .padding(.trailing, 12)
+                                
+                            }.buttonStyle(PlainButtonStyle())
+                                .disabled(cartVM.cart.contains(where: {$0.id == supply.id}) || (supply.totalCount - (supply.countOnHold ?? 0)) == 0)
+                        }
+                        
                     }
                 }
                 
@@ -226,6 +291,9 @@ struct SupplyCellView: View {
                 
                 
             }
+        }
+        .sheet(isPresented: $showingSheet) {
+            AddNewOneView(viewModel: vm, supply: supply, addNewLot: true)
         }
     }
 }

@@ -34,8 +34,10 @@ class ViewModel: ObservableObject {
 
     var errorMessage = ""
     private var cancellables = Set<AnyCancellable>()
+    private let fromOrderView: Bool
 
-    init() {
+    init(fromOrderView: Bool) {
+        self.fromOrderView = fromOrderView
         getSuppliesList()
         getDevicesList()
         addSubscribers()
@@ -90,9 +92,11 @@ class ViewModel: ObservableObject {
         
                 db.collection("supplies").addSnapshotListener { [unowned self] snapshot, error in
                     if let snapshot = snapshot {
-                        supplies = snapshot.documents.map({ supply in
-                          Supply(setSupply: supply)
-                        })
+                        var suppies = snapshot.documents.map({ Supply(setSupply: $0) })
+                        if fromOrderView {
+                            suppies = suppies.filter({$0.totalCount > 0})
+                        }
+                        self.supplies = suppies
                     }
                 }
     }

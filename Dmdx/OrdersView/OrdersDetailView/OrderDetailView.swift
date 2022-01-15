@@ -120,7 +120,11 @@ struct OrdersDetailView: View {
                 }
             }
             .sheet(isPresented: $addNewOne) {
-                SuppliesListView(fromOrderView: true, ordersDetailViewModel: vm)
+                SuppliesListView(fromOrderView: true) {
+                    vm.addNewOneInOrder(supply: $0) {
+                        self.addNewOne = false
+                    }
+                }
             }
             .listStyle(PlainListStyle())
             .navigationBarTitleDisplayMode(.inline)
@@ -172,14 +176,7 @@ struct OrderDetailCellView: View {
     
     
     var body: some View {
-        if let cardIndex = ordersDetailViewModel.suppliesInOrder.firstIndex(where: {$0.id == supply.id}) {
-            let bindingCount = Binding<Int>(
-                get: { ordersDetailViewModel.suppliesInOrder[cardIndex].count },
-                set: {
-                    ordersDetailViewModel.suppliesInOrder[cardIndex].count = $0
-                   
-                })
-            
+        
             HStack {
                 VStack(alignment: .leading, spacing: 4) {
                     HStack {
@@ -196,7 +193,6 @@ struct OrderDetailCellView: View {
                                     .font(.footnote)
                                 
                             }
-                            
                         }
                     }
                     Text(supply.device)
@@ -229,15 +225,21 @@ struct OrderDetailCellView: View {
                         .shadow(radius: 2)
                     
                     if editOrders {
-                        Stepper("Количество", value: bindingCount, in: 0...supply.totalCount)
-                            .labelsHidden()
-                        
-                        
+                        if let cardIndex = ordersDetailViewModel.suppliesInOrder.firstIndex(where: {$0.id == supply.id}) {
+                            let bindingCount = Binding<Int>(
+                                get: { ordersDetailViewModel.suppliesInOrder[cardIndex].count },
+                                set: {
+                                    ordersDetailViewModel.suppliesInOrder[cardIndex].count = $0
+                                   
+                                })
+                            Stepper("Количество", value: bindingCount, in: 0...supply.totalCount)
+                                .labelsHidden()
+                        }
                     }
                 }.padding(.trailing, 12)
                 
             }
-        }
+        
         
         
         

@@ -12,7 +12,9 @@ import Combine
 struct AddNewOneView: View {
     @ObservedObject var viewModel: ViewModel
     @EnvironmentObject var cartViewModel: CartViewModel
+    @State private var showingScanningView = false
     var supply: Supply?
+    let addNewLot: Bool
     @Environment(\.colorScheme) var colorScheme
     @State private var selected = ""
     @State private var date = Date()
@@ -26,6 +28,8 @@ struct AddNewOneView: View {
     var body: some View {
             ScrollView {
                 mainView
+            }.sheet(isPresented: $showingScanningView) {
+                ScanDocumentView(recognizedText: self.$supplyName)
             }
         }
 }
@@ -33,20 +37,31 @@ struct AddNewOneView: View {
 extension AddNewOneView {
     private var mainView: some View {
         VStack(spacing: 24) {
-            if supply == nil {
+            if supply == nil || addNewLot {
                 header
             }
             VStack(alignment: .leading, spacing: 24) {
                 categoryPicker
                     .padding(.bottom)
+                    .disabled(supply != nil && !isSupplyEdit)
                 nametextField
-                lotTextField
+                    .disabled(supply != nil && !isSupplyEdit)
                 Spacer()
-                expirationDatePicker
-                countOfNewOne
-            }.disabled(supply != nil && !isSupplyEdit)
+                if addNewLot {
+                    lotTextField
+                    expirationDatePicker
+                    countOfNewOne
+                } else {
+                    lotTextField
+                        .disabled(supply != nil && !isSupplyEdit)
+                    expirationDatePicker
+                        .disabled(supply != nil && !isSupplyEdit)
+                    countOfNewOne
+                        .disabled(supply != nil && !isSupplyEdit)
+                }
+            }
         
-            if supply != nil && supply!.totalCount - (supply!.countOnHold ?? 0) > 0 {
+            if !addNewLot && supply != nil && supply!.totalCount - (supply!.countOnHold ?? 0) > 0 {
                 countAddToCart.opacity(cartViewModel.cart.contains(where: {$0.id == supply!.id}) ? 0 : 1).animation(.linear, value: cartViewModel.cart.contains(where: {$0.id == supply!.id}))
             }
             Spacer()
@@ -99,7 +114,7 @@ extension AddNewOneView {
     
     private var header: some View {
         VStack(spacing: 4) {
-            Text("Добавление нового товара")
+            Text(addNewLot ? "Добавление нового LOT'a" : "Добавление нового товара")
                 .font(.system(size: 20))
                 .bold()
             Divider()
@@ -109,13 +124,13 @@ extension AddNewOneView {
     private var addingButton: some View {
         
         ZStack {
-            if supply == nil {
+            if supply == nil || addNewLot {
                 
                 Button {
-                    let _supply = Supply(id: supply?.id ?? "",
+                    let _supply = Supply(id: "",
                                          name: supplyName,
                                          device: selected,
-                                         count: count, totalCount: supply?.totalCount ?? totalCount,
+                                         count: count, totalCount: totalCount,
                                          dateCreated: Date(),
                                          expiredDate: date, supplyLot: supplyLot)
                     viewModel.addNewElementToDB(supply: _supply) {
@@ -197,9 +212,19 @@ extension AddNewOneView {
             })
         
         return VStack(alignment: .leading) {
-            Text("2. Название")
-                .font(.callout)
-                .bold()
+            HStack {
+                Text("2. Название")
+                    .font(.callout)
+                    .bold()
+                Spacer()
+                Button {
+                    showingScanningView.toggle()
+                } label: {
+                    Image(systemName: "camera.viewfinder")
+                }
+                
+            }
+           
             TextField("Введите название товара...", text: binding, onCommit: {
             })
                 .textFieldStyle(RoundedBorderTextFieldStyle())

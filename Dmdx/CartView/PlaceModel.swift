@@ -19,4 +19,15 @@ struct Place: Identifiable, Hashable {
         self.name = getPlaceSnapshot["name"] as? String ?? ""
         self.city = getPlaceSnapshot["city"] as? String ?? ""
     }
+    
+    init(name: String, city: String) {
+        self.id = ""
+        self.city = city
+        self.name = name
+    }
+    
+    func convertToDictionary() -> [String: Any] {
+        return ["name": name, "city": city]
+    }
+    
 }

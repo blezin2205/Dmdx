@@ -24,8 +24,10 @@ class SuppliesForCategoryViewModel: ObservableObject {
     @Published var sortedSuppliesForCategory = [Supply]()
     let db = Firestore.firestore()
     private var cancellables = Set<AnyCancellable>()
+    private let fromOrderView: Bool
     
-    init() {
+    init(fromOrderView: Bool) {
+        self.fromOrderView = fromOrderView
         addSubscribers()
     }
     
@@ -43,9 +45,11 @@ class SuppliesForCategoryViewModel: ObservableObject {
     func getDataforCategory(category: String) {
         db.collection("supplies").whereField("device", isEqualTo: category).getDocuments { snapshot, error in
             if let snapshot = snapshot {
-                self.suppliesForCategory = snapshot.documents.map({ supply in
-                    Supply(setSupply: supply)
-                })
+                var suppies = snapshot.documents.map({ Supply(setSupply: $0) })
+                if self.fromOrderView {
+                    suppies = suppies.filter({$0.totalCount > 0})
+                }
+                self.suppliesForCategory = suppies
             }
         }
     }

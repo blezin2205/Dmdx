@@ -26,7 +26,6 @@ class CartViewModel: ObservableObject {
         fetchTotalCountOfOrders()
         getSuppliesFromUserDef()
         addSubscribers()
-        getPlaces()
     }
     
     func addSubscribers() {

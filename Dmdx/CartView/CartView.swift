@@ -38,7 +38,7 @@ struct CartView: View {
                             Section(header: Text("ID заказа: \(cartVM.idForOrder)")) {
                                 ForEach(cartVM.cart) { supply in
                                     
-                                    SupplyCellView(supply: supply, viewForCart: true, fromOrderView: false)
+                                    SupplyCellView(supply: supply, viewForCart: true, fromOrderView: false, addComplition: nil)
                                         .swipeActions(allowsFullSwipe: true) {
                                             Button(role: .destructive) {
                                                 if let index = cartVM.cart.firstIndex(where: {$0.id == supply.id}) {
@@ -95,6 +95,9 @@ struct CartView: View {
     }
         .sheet(isPresented: $showingSheet) {
             ChoosePlaceView(cartVM: cartVM)
+                .onAppear {
+                    cartVM.getPlaces()
+                }
     }
     }
 }

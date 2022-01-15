@@ -8,7 +8,7 @@
 import Foundation
 import Firebase
 
-struct Supply: Identifiable, Codable {
+struct Supply: Identifiable, Codable, Hashable {
     let id: String
     let name: String
     let device: String
@@ -57,6 +57,10 @@ struct Supply: Identifiable, Codable {
     
     func convertToDictionary() -> [String: Any] {
         return ["name": name, "device": device, "count": totalCount, "countOnHold": countOnHold ?? 0, "dateCreated": Timestamp(date: dateCreated), "expiredDate": Timestamp(date: expiredDate), "supplyLot": supplyLot ?? ""]
+    }
+    
+    func convertToDictionaryForService() -> [String: Any] {
+        return ["name": name, "device": device, "count": count, "expiredDate": Timestamp(date: expiredDate), "supplyLot": supplyLot ?? ""]
     }
     
     func saveToOrders() -> [String: Any] {
