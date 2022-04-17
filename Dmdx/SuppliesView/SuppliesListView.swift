@@ -90,6 +90,10 @@ struct SuppliesListView: View {
             .sheet(isPresented: $showingSheet) {
                 AddNewOneView(viewModel: vm, addNewLot: false)
             }
+            .task {
+                await vm.reload()
+            }
+            
         }.searchable(text: $searchText)
         
         

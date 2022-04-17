@@ -20,6 +20,7 @@ class ViewModel: ObservableObject {
     }
     @Published var sortOption: SortOption = .all
     let sortOptionArray = SortOption.allCases
+    let testService = CounterpartyService()
 
     let db = Firestore.firestore()
     @Published var supplies = [Supply]()
@@ -31,7 +32,7 @@ class ViewModel: ObservableObject {
 
     @Published var supplyName = ""
     @Published var searchText = ""
-
+    @MainActor @Published var testcounterparty = [Counterparty]()
     var errorMessage = ""
     private var cancellables = Set<AnyCancellable>()
     private let fromOrderView: Bool
@@ -41,6 +42,19 @@ class ViewModel: ObservableObject {
         getSuppliesList()
         getDevicesList()
         addSubscribers()
+    }
+    
+    @MainActor func reload() async {
+       let result = await testService.getMyCounterparties(type: .sender)
+        switch result {
+            
+        case .success(let arr):
+            
+            self.testcounterparty = arr
+            print(self.testcounterparty)
+        case .failure(let err):
+            print(err)
+        }
     }
     
     func addSubscribers() {

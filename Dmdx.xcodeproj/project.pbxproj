@@ -7,6 +7,14 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		846F25C227FE170700AA199D /* Endpoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 846F25C127FE170700AA199D /* Endpoint.swift */; };
+		846F25C427FE171100AA199D /* HTTPClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 846F25C327FE171100AA199D /* HTTPClient.swift */; };
+		846F25C627FE171B00AA199D /* HTTPMethod.swift in Sources */ = {isa = PBXBuildFile; fileRef = 846F25C527FE171B00AA199D /* HTTPMethod.swift */; };
+		846F25C827FE172B00AA199D /* RequestError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 846F25C727FE172B00AA199D /* RequestError.swift */; };
+		846F25CA27FE1EF800AA199D /* CounterpartyEndpoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 846F25C927FE1EF800AA199D /* CounterpartyEndpoint.swift */; };
+		846F25CC27FE236200AA199D /* CounterpartyService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 846F25CB27FE236200AA199D /* CounterpartyService.swift */; };
+		846F25CF27FE240900AA199D /* Counterparty.swift in Sources */ = {isa = PBXBuildFile; fileRef = 846F25CE27FE240900AA199D /* Counterparty.swift */; };
+		846F25D127FE241400AA199D /* CounterpartyPerson.swift in Sources */ = {isa = PBXBuildFile; fileRef = 846F25D027FE241400AA199D /* CounterpartyPerson.swift */; };
 		FA0F761A274FD73100C80D41 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA0F7619274FD73000C80D41 /* Extensions.swift */; };
 		FA0F761C27501F0700C80D41 /* CartViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA0F761B27501F0600C80D41 /* CartViewModel.swift */; };
 		FA0F761F2750254400C80D41 /* CartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA0F761E2750254400C80D41 /* CartView.swift */; };
@@ -38,6 +46,14 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		846F25C127FE170700AA199D /* Endpoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Endpoint.swift; sourceTree = "<group>"; };
+		846F25C327FE171100AA199D /* HTTPClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTPClient.swift; sourceTree = "<group>"; };
+		846F25C527FE171B00AA199D /* HTTPMethod.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTPMethod.swift; sourceTree = "<group>"; };
+		846F25C727FE172B00AA199D /* RequestError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RequestError.swift; sourceTree = "<group>"; };
+		846F25C927FE1EF800AA199D /* CounterpartyEndpoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CounterpartyEndpoint.swift; sourceTree = "<group>"; };
+		846F25CB27FE236200AA199D /* CounterpartyService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CounterpartyService.swift; sourceTree = "<group>"; };
+		846F25CE27FE240900AA199D /* Counterparty.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Counterparty.swift; sourceTree = "<group>"; };
+		846F25D027FE241400AA199D /* CounterpartyPerson.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CounterpartyPerson.swift; sourceTree = "<group>"; };
 		FA0F7619274FD73000C80D41 /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		FA0F761B27501F0600C80D41 /* CartViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartViewModel.swift; sourceTree = "<group>"; };
 		FA0F761E2750254400C80D41 /* CartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartView.swift; sourceTree = "<group>"; };
@@ -81,6 +97,53 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		846F25BE27FE16DD00AA199D /* Base */ = {
+			isa = PBXGroup;
+			children = (
+				846F25C127FE170700AA199D /* Endpoint.swift */,
+				846F25C327FE171100AA199D /* HTTPClient.swift */,
+				846F25C527FE171B00AA199D /* HTTPMethod.swift */,
+				846F25C727FE172B00AA199D /* RequestError.swift */,
+			);
+			path = Base;
+			sourceTree = "<group>";
+		};
+		846F25BF27FE16E500AA199D /* Endpoints */ = {
+			isa = PBXGroup;
+			children = (
+				846F25C927FE1EF800AA199D /* CounterpartyEndpoint.swift */,
+			);
+			path = Endpoints;
+			sourceTree = "<group>";
+		};
+		846F25C027FE16EE00AA199D /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				846F25CB27FE236200AA199D /* CounterpartyService.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		846F25CD27FE23F400AA199D /* ResponseModel */ = {
+			isa = PBXGroup;
+			children = (
+				846F25CE27FE240900AA199D /* Counterparty.swift */,
+				846F25D027FE241400AA199D /* CounterpartyPerson.swift */,
+			);
+			path = ResponseModel;
+			sourceTree = "<group>";
+		};
+		8484683B27FC5D530034BEDC /* Network */ = {
+			isa = PBXGroup;
+			children = (
+				846F25CD27FE23F400AA199D /* ResponseModel */,
+				846F25C027FE16EE00AA199D /* Services */,
+				846F25BF27FE16E500AA199D /* Endpoints */,
+				846F25BE27FE16DD00AA199D /* Base */,
+			);
+			path = Network;
+			sourceTree = "<group>";
+		};
 		FA0F761D2750252400C80D41 /* CartView */ = {
 			isa = PBXGroup;
 			children = (
@@ -176,11 +239,12 @@
 		FADC35EE274905C500449231 /* Dmdx */ = {
 			isa = PBXGroup;
 			children = (
-				FADC35EF274905C500449231 /* DmdxApp.swift */,
 				FA660BBB274C3067003DAB66 /* SuppliesView */,
+				FADC35EF274905C500449231 /* DmdxApp.swift */,
 				FA7799C02750D29D0063142A /* OrdersView */,
 				FAE5AFF1278F771200A81500 /* ServiceView */,
 				FA0F76202750307100C80D41 /* Model */,
+				8484683B27FC5D530034BEDC /* Network */,
 				FA0F761D2750252400C80D41 /* CartView */,
 				FA580BA9274C004700EEEEAF /* TabView.swift */,
 				FADC35FE274906CE00449231 /* NetworkManager.swift */,
@@ -290,8 +354,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				846F25CA27FE1EF800AA199D /* CounterpartyEndpoint.swift in Sources */,
+				846F25C827FE172B00AA199D /* RequestError.swift in Sources */,
 				FA580BAA274C004800EEEEAF /* TabView.swift in Sources */,
 				FA660BBD274C30FB003DAB66 /* AddNewOneView.swift in Sources */,
+				846F25C427FE171100AA199D /* HTTPClient.swift in Sources */,
 				FAAD916827554C35001A5651 /* PlaceModel.swift in Sources */,
 				FAB22C34274C728500F817BD /* SuppliesForCategoryViewModel.swift in Sources */,
 				FAACF008278F7CCD0052B34E /* ServiceDetailViewModel.swift in Sources */,
@@ -312,8 +379,13 @@
 				FADC35F0274905C500449231 /* DmdxApp.swift in Sources */,
 				FA660BBA274C2E8D003DAB66 /* OrdersView.swift in Sources */,
 				FA0F76222750308600C80D41 /* SuppliesModel.swift in Sources */,
+				846F25CF27FE240900AA199D /* Counterparty.swift in Sources */,
+				846F25D127FE241400AA199D /* CounterpartyPerson.swift in Sources */,
+				846F25C627FE171B00AA199D /* HTTPMethod.swift in Sources */,
 				FAB22C31274C720C00F817BD /* SuppliesListForCategoryView.swift in Sources */,
 				FA0F761C27501F0700C80D41 /* CartViewModel.swift in Sources */,
+				846F25C227FE170700AA199D /* Endpoint.swift in Sources */,
+				846F25CC27FE236200AA199D /* CounterpartyService.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
